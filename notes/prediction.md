@@ -1,0 +1,1 @@
+10/27/26: very rough predictions 11-12ET: with trend break = 50%, no break = 30%, counter-trend break = 20%.
