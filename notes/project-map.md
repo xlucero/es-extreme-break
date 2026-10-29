@@ -10,6 +10,34 @@ How often does ES make a new session extreme between 11:00 and 12:00 Eastern, re
 
 ---
 
+## Methods and process
+
+**Discrete-time survival analysis.** Each session either experiences an event
+(a break) at a known minute or reaches the end of the window without one. The
+99 non-breaking sessions are right-censored and remain in every denominator.
+The cumulative break curve is a cumulative incidence function; the five-minute
+block chart is a discrete-time hazard rate. The hazard calculation was derived
+here by reasoning about a shrinking pool of unbroken sessions, which turned out
+to be the standard definition.
+
+**Event study design.** The 09:30–10:59 reference window is an estimation
+window and the 11:00–12:00 test window is an event window. This is the standard
+two-window structure in empirical finance research.
+
+**CRISP-DM.** Project process: business understanding (scoping), data
+understanding (the validation pass), data preparation (`load`, `sessions`,
+`features`), modeling (`stats`), evaluation (hand-validation, stability check,
+the confound), deployment (README, figures, writeup).
+
+**Pre-registration.** Thresholds and predicted rates committed to
+`notes/prediction.md` before any statistics were computed.
+
+**Stratification.** Distance is a confounder of the direction result and a
+predictor in its own right. It is held constant for the first question and
+varied for the second.
+
+---
+
 ## Data
 
 |  |  |
