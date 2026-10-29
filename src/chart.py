@@ -125,6 +125,75 @@ def chart_by_distance(table, grid, path):
     plt.close(fig)
 
 
+def chart_by_distance(strata, medians, path):
+    """Dot-and-interval plot of break rate by distance band.
+
+    strata  : DataFrame read from output/distance_strata.csv, one row per band
+    medians : DataFrame from median_minutes.main(), same bands in the same order
+
+    Bands are matched by position, not by label, because the two files were
+    written by different modules and their label text need not agree.
+    """
+    if len(strata) != len(medians):
+        raise ValueError("strata and medians must cover the same bands in the same order")
+
+    labels = list(strata["band"])
+    rate = list(strata["rate"])
+    lo = list(strata["lo"])
+    hi = list(strata["hi"])
+    counts = list(strata["n"])
+    median_min = list(medians["median_min"])
+
+    if max(rate) > 1.5:
+        rate = [v / 100 for v in rate]
+        lo = [v / 100 for v in lo]
+        hi = [v / 100 for v in hi]
+
+    positions = list(range(len(labels)))
+
+    fig, ax = plt.subplots(figsize=(9.5, 4.2))
+
+    for y in positions:
+        ax.plot([lo[y], hi[y]], [y, y], color="#378ADD",
+                linewidth=2.5, solid_capstyle="round", zorder=1)
+        ax.plot([rate[y]], [y], marker="o", markersize=9,
+                color="#185FA5", zorder=2)
+
+    for y in positions:
+        ax.text(1.03, y, f"{rate[y]:.0%}", transform=ax.get_yaxis_transform(),
+                va="center", ha="left", fontsize=10, color="#0B0B0B")
+        ax.text(1.14, y, f"n={counts[y]}", transform=ax.get_yaxis_transform(),
+                va="center", ha="left", fontsize=9, color="#52514E")
+        ax.text(1.27, y, f"{median_min[y]:.0f} min", transform=ax.get_yaxis_transform(),
+                va="center", ha="left", fontsize=9, color="#52514E")
+
+    ax.text(1.03, 1.04, "rate", transform=ax.transAxes, fontsize=8, color="#898781")
+    ax.text(1.14, 1.04, "n", transform=ax.transAxes, fontsize=8, color="#898781")
+    ax.text(1.27, 1.04, "median", transform=ax.transAxes, fontsize=8, color="#898781")
+
+    ax.set_yticks(positions)
+    ax.set_yticklabels(labels)
+    ax.invert_yaxis()
+    ax.tick_params(axis="y", length=0)
+
+    ax.set_xlim(0, 1)
+    ax.set_xticks([0, 0.25, 0.5, 0.75, 1.0])
+    ax.set_xticklabels(["0%", "25%", "50%", "75%", "100%"])
+    ax.set_xlabel("Break rate by 12:00, with 95% Wilson interval")
+
+    ax.grid(axis="x", color="#E1E0D9", linewidth=1)
+    ax.set_axisbelow(True)
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+
+    ax.set_title("Distance from the 10:59 close to the nearer reference extreme",
+                 loc="left", pad=20)
+
+    fig.subplots_adjust(left=0.14, right=0.70, top=0.82, bottom=0.16)
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     table = pd.read_csv("output/session_features.csv")
     grid = minute_grid()
@@ -132,5 +201,9 @@ if __name__ == "__main__":
     chart_cumulative(table, grid, "output/fig1_cumulative.png")
     chart_hazard(table, grid, "output/fig2_hazard.png")
     chart_stability(table, grid, "output/fig3_stability.png")
-    chart_by_distance(table, grid, "output/fig4_by_distance.png")
+    from median_minutes import main as median_minutes_table
+
+    strata = pd.read_csv("output/distance_strata.csv")
+    medians = median_minutes_table()
+    chart_by_distance(strata, medians, "output/fig4_by_distance.png")
     print("wrote 3 figures to output/")
