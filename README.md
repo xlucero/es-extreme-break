@@ -167,7 +167,8 @@ python src/chart.py
 python src/validate.py
 ```
 
-The raw price data is not in this repository. Exchange licensing restricts redistribution of market data, so the code is published and the input is not. `notes/data_dictionary.md` documents the expected format. The code looks for `data/raw/ES_1min_RTH_500d.txt`.
+The raw price data is not in this repository. Exchange licensing restricts redistribution of market data, so the code is published and the input is not. `notes/data_dictionary.md` documents the expected format. The code looks for `data/raw/ES_1min_RTH_500d.txt`. The CSV files in `output/` hold per-session derived values — reference extremes,
+closes, and computed statistics — not raw bars.
 
 ## Contents
 
